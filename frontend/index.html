@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ARPZO Voice Assistant & Private Driver Calling</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- TOP HEADER -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">🎙️</div>
+        <div>
+          <h1 class="brand-title">ARPZO Voice Agent</h1>
+          <p class="brand-subtitle">Ollama Trial Model &bull; Strict Jain Guardrails &bull; Private Driver Calling</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="engine-badge" id="engineBadge">
+          <span class="status-dot"></span>
+          <span id="engineName">Ollama Local / Simulator</span>
+        </div>
+        <div class="language-selector" id="langSelector">
+          <button class="lang-btn active" data-lang="hinglish" id="langHinglishBtn">Hinglish</button>
+          <button class="lang-btn" data-lang="hindi" id="langHindiBtn">हिन्दी</button>
+          <button class="lang-btn" data-lang="english" id="langEnglishBtn">English</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN INTERFACE GRID -->
+    <main class="main-grid">
+      <!-- LEFT COLUMN: CONVERSATION & PROPOSALS -->
+      <section class="chat-section">
+        <div class="chat-header">
+          <div class="branch-tag">📍 Koramangala Central Branch</div>
+          <button class="btn-ghost" id="clearChatBtn" title="Reset Session">🔄 Reset Chat</button>
+        </div>
+
+        <div class="messages-container" id="messagesContainer">
+          <!-- Welcome message -->
+          <div class="message assistant">
+            <div class="msg-avatar">🤖</div>
+            <div class="msg-bubble">
+              <p><strong>Namaste!</strong> Welcome to ARPZO. Main aapka AI food ordering assistant hoon.</p>
+              <p class="subtext">Aap bolkar ya type karke food search kar sakte hain, Jain guardrails check kar sakte hain, ya pichla order repeat kar sakte hain!</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- QUICK CHIPS -->
+        <div class="quick-chips">
+          <span class="chips-label">Try asking:</span>
+          <button class="chip" data-prompt="Jain Special Capsicum and Corn Pizza add kar do">🍕 Jain Pizza</button>
+          <button class="chip" data-prompt="Paneer Butter Masala Jain ban sakta hai kya?">🥘 Jain Paneer Question</button>
+          <button class="chip" data-prompt="Jain Dal Khichdi Full add karo">🍲 Jain Khichdi</button>
+          <button class="chip" data-prompt="Same as last time repeat kar do">🔄 Repeat Past Order</button>
+          <button class="chip" data-prompt="Order status track karo">🛵 Track Order</button>
+        </div>
+
+        <!-- INPUT BAR & PUSH TO TALK -->
+        <div class="input-panel">
+          <button class="mic-btn" id="micBtn" title="Push-to-Talk (Click to Speak / Stop)">
+            <span class="mic-icon">🎤</span>
+            <span class="mic-pulse"></span>
+          </button>
+          
+          <div class="input-wrapper">
+            <input type="text" id="userInput" placeholder="Speak or type in Hinglish, Hindi, or English..." autocomplete="off">
+            <button class="send-btn" id="sendBtn" title="Send message">➔</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN: PROPOSAL CARD & CALLING WIDGET -->
+      <aside class="sidebar-section">
+        <!-- PROPOSAL CARD BOX -->
+        <div class="card proposal-widget">
+          <div class="card-header">
+            <h2>🛒 Active Order Proposal</h2>
+            <span class="badge" id="proposalStatusBadge">NO ACTIVE PROPOSAL</span>
+          </div>
+
+          <div class="proposal-body" id="proposalBody">
+            <div class="empty-state">
+              <span class="empty-icon">🍽️</span>
+              <p>Cart is currently empty. Ask the assistant to add dishes to view the validated proposal card.</p>
+            </div>
+          </div>
+
+          <div class="proposal-footer" id="proposalFooter" style="display: none;">
+            <div class="idempotency-note">🔒 Protected by <code>Idempotency-Key</code></div>
+            <button class="btn-confirm" id="confirmOrderBtn">✅ Confirm & Place Order</button>
+          </div>
+        </div>
+
+        <!-- PRIVATE CALLING WIDGET (RTC / AGORA SIMULATOR) -->
+        <div class="card calling-widget">
+          <div class="card-header">
+            <h2>📞 Private Rider Calling</h2>
+            <span class="badge badge-success">ACTIVE ORDER</span>
+          </div>
+
+          <div class="calling-body">
+            <div class="driver-info">
+              <div class="driver-avatar">🛵</div>
+              <div>
+                <div class="driver-name">Rahul Kumar</div>
+                <div class="driver-meta">Assigned Delivery Partner &bull; Order #ord_live_789</div>
+              </div>
+            </div>
+
+            <div class="privacy-guarantee">
+              <span>🛡️ Zero PSTN Exposure: Neither person's real phone number is ever shared.</span>
+            </div>
+
+            <button class="btn-call" id="startCallBtn">
+              <span>📞</span> Call Driver via Private RTC
+            </button>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- CALL MODAL OVERLAY -->
+    <div class="modal-overlay" id="callModal" style="display: none;">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>Private Internet Audio Call</h3>
+          <span class="recording-indicator" id="recIndicator">🔴 RECORDING ACTIVE</span>
+        </div>
+
+        <div class="call-avatar-pulse">
+          <div class="pulse-ring"></div>
+          <div class="call-avatar">🛵</div>
+        </div>
+
+        <div class="call-party-name">Rahul Kumar (Driver)</div>
+        <div class="call-state-text" id="callStateText">Connecting to secure RTC channel...</div>
+        <div class="call-timer" id="callTimer">00:00</div>
+
+        <div class="consent-box" id="consentBox">
+          <label>
+            <input type="checkbox" id="consentCheckbox" checked>
+            I consent to call recording for safety, delivery proof, and quality verification.
+          </label>
+        </div>
+
+        <div class="call-controls">
+          <button class="ctrl-btn" id="muteBtn" title="Mute Microphone">🎤</button>
+          <button class="ctrl-btn btn-danger" id="hangupBtn" title="End Call">❌ End Call</button>
+          <button class="ctrl-btn" id="chatFallbackBtn" title="Switch to Chat">💬 Chat</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

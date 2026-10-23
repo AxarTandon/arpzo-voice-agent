@@ -217,7 +217,8 @@ When a cart is proposed, the assistant renders a structured ASCII proposal card:
 ### 1. Interactive CLI (Voice & Text Simulation)
 Run the interactive terminal assistant with push-to-talk turn simulation:
 ```bash
-python arpzo_assistant.py
+python run.py --cli
+# or directly: python arpzo_assistant.py
 ```
 *Try typing:*
 - `"Mujhe Jain pizza add karna hai"`
@@ -225,115 +226,95 @@ python arpzo_assistant.py
 - `"Same as last time repeat kardo"`
 - `"Order kahan pahucha, track karo"`
 
-### 2. Start the FastAPI Production Server
+### 2. Start the FastAPI Backend & Web Application
 ```bash
-uvicorn api_server:app --host 0.0.0.0 --port 8000 --reload
+python run.py --server
+# or directly: python backend/main.py
 ```
-Interactive Swagger documentation is available at `http://localhost:8000/docs`!
+- **Web Interface (Glassmorphic Voice Assistant & Calling)**: `http://localhost:8000/app/`
+- **Interactive Swagger Documentation**: `http://localhost:8000/docs`
 
 ---
 
-## 🧪 Automated Verification & Acceptance Tests
+## 🧪 Automated Verification & Security Acceptance Tests
 
-Execute the comprehensive test suite validating all requirements from Section 12, 13, and 14:
-
+Run all test suites in a single command:
 ```bash
-python test_suite.py
+python run.py --test
 ```
 
-### Test Evidence Summary
+Or run individual targeted test suites:
+```bash
+# 1. Run Dedicated Security & Threat Audit (SEC-01 to SEC-08)
+python run.py --security
+# or: python tests/test_security.py
+
+# 2. Run Assistant Acceptance Tests (A01 to A15)
+python tests/test_assistant.py
+
+# 3. Run Private Calling Acceptance Tests (C01 to C17)
+python tests/test_calling.py
+
+# 4. Run REST & WebSocket API Tests
+python tests/test_api.py
+```
+
+### 🛡️ Dedicated Security Audit Results (`python run.py --security`)
 ```text
-============================================================================
-  ARPZO VOICE AGENT & PRIVATE CALLING MVP - FORMAL ACCEPTANCE SUITE
-  Author: Axar Tandon (3rd Year B.Tech CSE - AI/ML)
-============================================================================
-
---- [GROUP 1] ASSISTANT ACCEPTANCE TESTS (A01 - A15) ---
-  [PASS] A01: Hinglish speech turn processed and added to pending cart
-  [PASS] A01: Hindi food request identified and clarified
-  [PASS] A02: Search result 'Veg Cheese Pizza' matches query
-  [PASS] A02: Search result 'Jain Special Capsicum & Corn Pizza' matches query
-  [PASS] A02: Spice and creaminess answered strictly from verified menu data
-  [PASS] A03: Paneer Butter Masala (onion & garlic) strictly excluded from Jain filter
-  [PASS] A03: Veg Cheese Pizza (onion & garlic) strictly excluded from Jain filter
-  [PASS] A03: Chicken Biryani (non-veg) strictly excluded from Jain filter
-  [PASS] A03: Verified root-free Jain dishes included in Jain catalog
-  [PASS] A03: Polite educational response explains why dish cannot be prepared Jain
-  [PASS] A04: Gluten presence accurately retained (no false gluten-free claim)
-  [PASS] A05: Verified protein data retrieved (18g)
-  [PASS] A06: Consented preference memory loaded for user
-  [PASS] A06: Preferences require explicit consent timestamp
-  [PASS] A07: Subtotal is exact: INR 619
-  [PASS] A07: 5% GST is exact: INR 30.95
-  [PASS] A07: Grand Total is exact: INR 674.95
-  [PASS] A07: Proposal strictly enforces requires_confirmation=True
-  [PASS] A08: Proposal is stamped with cart_version=1
-  [PASS] A08: Proposal has explicit 2-minute expiration timestamp
-  [PASS] A09: Group proposal total (INR 1052.95) stays under INR 1500 budget
-  [PASS] A09: Group proposal displays clear per-person dietary allocation
-  [PASS] A10: Re-order loads customer's own completed order
-  [PASS] A10: Re-order items re-validated on active menu
-  [PASS] A10: Re-order detects price changes rather than silently copying past prices
-  [PASS] A11: Live order status retrieved with source timestamp
-  [PASS] A11: Rider assigned: Private calling option enabled
-  [PASS] A12: Assistant generates proposal only; cannot autonomously charge credit cards
-  [PASS] A13: At most one relevant optional pairing suggestion
-  [PASS] A14: Access denied to unauthorized order reference
-  [PASS] A15: Assistant clarifies missing pizza size before creating proposal
-
---- [GROUP 2] PRIVATE CALLING ACCEPTANCE TESTS (C01 - C17) ---
-  [PASS] C01: Unauthorized stranger denied call access without data leakage
-  [PASS] C02: Calling denied at or after delivered_at + 30 minutes
-  [PASS] C03: Cancelled order or reassigned driver revoked immediately
-  [PASS] C04: Authorized call attempt successfully created with RINGING state
-  [PASS] C05: Short-lived 10-minute RTC media token issued
-  [PASS] C06: Opaque random channel ID used instead of raw order ID
-  [PASS] C07: Call state tracks live server authority
-  [PASS] C08: Assistant microphone released during human-to-human audio call
-  [PASS] C09: Assistant never transcribes driver-customer private conversation
-  [PASS] C10: Call authoritatively ended on server
-  [PASS] C10: Token generation rejected for terminated call session
-  [PASS] C11: Call attempts 1-5 allowed under rate limit
-  [PASS] C11: 6th call attempt blocked by 10-minute rate limit (HTTP 429)
-  [PASS] C12: Server assigns authoritative call duration
-  [PASS] C13: Call blocked when either party declines recording consent; fallback to chat
-  [PASS] C13: User media enabled ONLY when both parties consent and recorder is ready
-  [PASS] C14: Recording metadata marked READY only after finalization
-  [PASS] C15: Customers and drivers denied recording playback link
-  [PASS] C15: Authorized admin receives audited 5-minute expiring playback URL
-  [PASS] C16: Bounded 20-second reconnection state machine with timeout fallback
-  [PASS] C17: Real phone numbers strictly absent from call signaling records
-
---- [GROUP 3] OPERATIONAL & SYSTEM CHECKS (N01 - N04) ---
-  [PASS] N01: Autonomous high-fidelity simulator seamlessly active
-
 ========================================================
-  TOTAL TESTS RUN: 63
-  PASSED: 63 | FAILED: 0
+  RUNNING ARPZO SECURITY & DEFENSE AUDIT SUITE           
 ========================================================
 
-VERDICT: PASS
-```
+  [PASS] SEC-01: Prompt injection and jailbreak attempts intercepted.
+  [PASS] SEC-02: Tenant isolation verified; unauthorized participants denied.
+  [PASS] SEC-03: 5 attempts/10min rate limit enforced; 6th attempt returned HTTP 429.
+  [PASS] SEC-04: Two-party consent gate blocks audio if unrecorded.
+  [PASS] SEC-05: Admin-only signed playback links issued with audit logging.
+  [PASS] SEC-06: Telemetry scrubbed; zero real phone numbers or keys exposed.
+  [PASS] SEC-07: Delivery + 30m cutoff strictly blocks stale call attempts.
 
-To test all FastAPI HTTP endpoints directly:
-```bash
-python test_api_endpoints.py
+----------------------------------------------------------------------
+Ran 7 tests in 0.003s
+
+OK
 ```
 
 ---
 
-## 🛠️ Project Structure
+## 📁 Sorted & Modular Project Structure
 
 ```text
 arpzo-voice-agent/
-├── arpzo_assistant.py        # Core Engine: Ollama LLM client, simulator, tools, calling manager & CLI
-├── api_server.py             # FastAPI REST & WebSocket server implementing Section 5 & 8 specs
-├── resto_bridge.py           # Integration bridge mapping Karan7s7n/resto schemas to ARPZO tools
-├── test_suite.py             # Acceptance test suite verifying A01-A15, C01-C17, N01-N04
-├── test_api_endpoints.py     # FastAPI TestClient test script verifying REST routes
-├── README.md                 # Complete system documentation, audit, and setup instructions
-├── .gitignore                # Standard repository ignore configuration
-└── Restro                    # Entrypoint runner script
+├── backend/
+│   ├── app/
+│   │   ├── __init__.py           # Application package exports
+│   │   ├── config.py             # Server ports, Ollama URLs, Agora tokens, rate limits
+│   │   ├── security.py           # Prompt injection filters, tenant isolation, scrubbing
+│   │   ├── catalog.py            # In-memory verified catalog, nutrition, strict Jain facts
+│   │   ├── tools.py              # search_menu, propose_cart, reorder, live tracking
+│   │   ├── assistant.py          # Ollama local LLM engine + autonomous simulator
+│   │   ├── calling.py            # Private Calling Manager, Agora tokens, consent gate
+│   │   ├── bridge.py             # RestoBridge mapping to Karan7s7n/resto MongoDB
+│   │   └── api.py                # FastAPI endpoints, WebSockets, static file mounts
+│   ├── main.py                   # Backend entrypoint (uvicorn launcher)
+│   └── requirements.txt          # Python dependencies
+│
+├── frontend/
+│   ├── index.html                # Glassmorphic web UI (voice mic, cards, calling modal)
+│   ├── style.css                 # Vanilla CSS: dark mode, pulse waves, responsive design
+│   └── app.js                    # Web Speech API, live cart proposals, Agora RTC simulator
+│
+├── tests/
+│   ├── test_security.py          # Dedicated security audit: SEC-01 to SEC-08
+│   ├── test_assistant.py         # Assistant acceptance tests: A01 to A15
+│   ├── test_calling.py           # Private calling tests: C01 to C17
+│   └── test_api.py               # FastAPI REST & WebSocket test suite
+│
+├── run.py                        # Unified orchestrator (--server, --cli, --test, --security)
+├── arpzo_assistant.py            # Standalone CLI entrypoint
+├── test_suite.py                 # Acceptance runner for all 63 P0 cases
+├── .gitignore                    # Git ignore configuration
+└── README.md                     # Complete project documentation & audit report
 ```
 
 ---
