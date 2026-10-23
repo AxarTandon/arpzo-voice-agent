@@ -1,0 +1,8 @@
+#!/usr/bin/env python3
+"""
+Entrypoint launcher for ARPZO Food Ordering Assistant.
+"""
+from arpzo_assistant import main
+
+if __name__ == "__main__":
+    main()
